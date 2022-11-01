@@ -1,34 +1,28 @@
+#include "macros.i"
+
 .syntax unified
 .thumb
 
-.macro montgomerym3 q, qinv, a, tmp
-    mul.w \tmp, \a, \qinv
-    sxth.w \tmp, \tmp
-    mla.w \a, \tmp, \q, \a
-    asr.w \a, \a, #16
+.macro fullplant a0, a1, a2, a3, q, alpha2, plantconst
+  ### plantconst=plantconst*(p^-1) % 2^32
+  movw \plantconst, #44984
+  movt \plantconst, #19
+  plant_mul_const_inplace_m3 \q, \alpha2, \plantconst, \a0
+  plant_mul_const_inplace_m3 \q, \alpha2, \plantconst, \a1
+  plant_mul_const_inplace_m3 \q, \alpha2, \plantconst, \a2
+  plant_mul_const_inplace_m3 \q, \alpha2, \plantconst, \a3
 .endm
 
-.macro gsbutterflym3 poly0, poly1, twiddle, tmp, q, qinv
-    sub.w \tmp, \poly0, \poly1
-    add.w \poly0, \poly0, \poly1
-
-    mul.w \poly1, \tmp, \twiddle
-    montgomerym3 \q, \qinv, \poly1, \tmp
+.macro halfplant a0, a1, q, alpha2, plantconst
+  ### plantconst=plantconst*(p^-1) % 2^32
+  movw \plantconst, #44984
+  movt \plantconst, #19
+  plant_mul_const_inplace_m3 \q, \alpha2, \plantconst, \a0
+  plant_mul_const_inplace_m3 \q, \alpha2, \plantconst, \a1
 .endm
 
-.macro fqmulprecompm3 a, twiddle, tmp,  q, qinv
-    mul.w \a, \a, \twiddle
-    montgomerym3 \q, \qinv, \a, \tmp
-.endm
 
-.macro signed_barrettm3 a, q, tmp, barrettconst
-  mul.w \tmp, \a, \barrettconst
-  // 2^26
-  add.w \tmp, \tmp, #67108864
-  asr.w \tmp, \tmp, #27
-  mla.w \a, \tmp, \q, \a
-.endm
-
+// |input|<kq; output:
 .global invntt_fast_m3
 .type invntt_fast_m3, %function
 .align 2
@@ -46,15 +40,13 @@ invntt_fast_m3:
   poly6       .req r8
   poly7       .req r9
   twiddle     .req r10
-  montconst   .req r10
-  barrettconst .req r10
+  plantconst  .req r10
+  alpha2      .req r11
+  q           .req r12
+  tmp         .req r14
 
-  qinv        .req r14
-  q           .req r11
-  tmp         .req r12
-
+  movw alpha2, #8
   movw q, #3329
-  movw qinv, #3327
 
   ### LAYER 1 (skip layer 0)
   movw tmp, #32
@@ -70,22 +62,16 @@ invntt_fast_m3:
     ldrsh.w poly6, [poly,#12]
     ldrsh.w poly7, [poly,#14]
 
-    ldrsh.w twiddle, [twiddle_ptr], #2
-    gsbutterflym3 poly0, poly2, twiddle, tmp, q, qinv
-    gsbutterflym3 poly1, poly3, twiddle, tmp, q, qinv
+    ldr.w twiddle, [twiddle_ptr], #4
+    gs_butterfly_m3 poly0, poly2, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly1, poly3, twiddle, q, alpha2, tmp
 
-    ldrsh.w twiddle, [twiddle_ptr], #2
-    gsbutterflym3 poly4, poly6, twiddle, tmp, q, qinv
-    gsbutterflym3 poly5, poly7, twiddle, tmp, q, qinv
+    ldr.w twiddle, [twiddle_ptr], #4
+    gs_butterfly_m3 poly4, poly6, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly5, poly7, twiddle, q, alpha2, tmp
 
-
-    //-40318
-    movw barrettconst, #25218
-    sxth barrettconst, barrettconst
-    signed_barrettm3 poly0, q, tmp, barrettconst
-    signed_barrettm3 poly1, q, tmp, barrettconst
-    signed_barrettm3 poly4, q, tmp, barrettconst
-    signed_barrettm3 poly5, q, tmp, barrettconst
+    // TODO optimize modular reduction strategy
+    // fullplant poly0, poly1, poly4, poly5, q, alpha2, plantconst
 
     strh.w poly1, [poly,#2]
     strh.w poly2, [poly,#4]
@@ -118,28 +104,28 @@ invntt_fast_m3:
     ldrsh.w poly6, [poly, #48]
     ldrsh.w poly7, [poly, #56]
 
-    ldrsh.w twiddle, [twiddle_ptr, #0]
-    gsbutterflym3 poly0, poly1, twiddle, tmp, q, qinv
-    ldrsh.w twiddle, [twiddle_ptr, #2]
-    gsbutterflym3 poly2, poly3, twiddle, tmp, q, qinv
-    ldrsh.w twiddle, [twiddle_ptr, #4]
-    gsbutterflym3 poly4, poly5, twiddle, tmp, q, qinv
-    ldrsh.w twiddle, [twiddle_ptr, #6]
-    gsbutterflym3 poly6, poly7, twiddle, tmp, q, qinv
+    ldr.w twiddle, [twiddle_ptr, #0]
+    gs_butterfly_m3 poly0, poly1, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #4]
+    gs_butterfly_m3 poly2, poly3, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #8]
+    gs_butterfly_m3 poly4, poly5, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #12]
+    gs_butterfly_m3 poly6, poly7, twiddle, q, alpha2, tmp
 
-    ldrsh.w twiddle, [twiddle_ptr, #8]
-    gsbutterflym3 poly0, poly2, twiddle, tmp, q, qinv
-    gsbutterflym3 poly1, poly3, twiddle, tmp, q, qinv
+    ldr.w twiddle, [twiddle_ptr, #16]
+    gs_butterfly_m3 poly0, poly2, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly1, poly3, twiddle, q, alpha2, tmp
 
-    ldrsh.w twiddle, [twiddle_ptr, #10]
-    gsbutterflym3 poly4, poly6, twiddle, tmp, q, qinv
-    gsbutterflym3 poly5, poly7, twiddle, tmp, q, qinv
+    ldr.w twiddle, [twiddle_ptr, #20]
+    gs_butterfly_m3 poly4, poly6, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly5, poly7, twiddle, q, alpha2, tmp
 
-    ldrsh.w twiddle, [twiddle_ptr, #12]
-    gsbutterflym3 poly0, poly4, twiddle, tmp, q, qinv
-    gsbutterflym3 poly1, poly5, twiddle, tmp, q, qinv
-    gsbutterflym3 poly2, poly6, twiddle, tmp, q, qinv
-    gsbutterflym3 poly3, poly7, twiddle, tmp, q, qinv
+    ldr.w twiddle, [twiddle_ptr, #24]
+    gs_butterfly_m3 poly0, poly4, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly1, poly5, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly2, poly6, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly3, poly7, twiddle, q, alpha2, tmp
 
     // TODO: I don't quite know why this does not work.
     //-40318
@@ -150,11 +136,13 @@ invntt_fast_m3:
     //signed_barrettm3 poly2, q, tmp, barrettconst
     //signed_barrettm3 poly3, q, tmp, barrettconst
     /* montgomery */
-    movw montconst, #2285
-    fqmulprecompm3 poly0, montconst, tmp, q, qinv
-    fqmulprecompm3 poly1, montconst, tmp, q, qinv
-    fqmulprecompm3 poly2, montconst, tmp, q, qinv
-    fqmulprecompm3 poly3, montconst, tmp, q, qinv
+    // fullplant poly0, poly1, poly2, poly3, q, alpha2, plantconst
+
+    // movw montconst, #2285
+    // fqmulprecompm3 poly0, montconst, q, alpha2, tmp
+    // fqmulprecompm3 poly1, montconst, q, alpha2, tmp
+    // fqmulprecompm3 poly2, montconst, q, alpha2, tmp
+    // fqmulprecompm3 poly3, montconst, q, alpha2, tmp
 
     strh.w poly1, [poly,#8]
     strh.w poly2, [poly,#16]
@@ -170,7 +158,7 @@ invntt_fast_m3:
     .endif
     .set k, k+1
     .endr
-    add.w twiddle_ptr, #14
+    add.w twiddle_ptr, #14*2
     pop.w {tmp}
     subs.w tmp, #1
   bne.w 2b
@@ -190,33 +178,41 @@ invntt_fast_m3:
     ldrsh.w poly6, [poly, #384]
     ldrsh.w poly7, [poly, #448]
 
-    ldrsh.w twiddle, [twiddle_ptr]
-    gsbutterflym3 poly0, poly1, twiddle, tmp, q, qinv
-    ldrsh.w twiddle, [twiddle_ptr, #2]
-    gsbutterflym3 poly2, poly3, twiddle, tmp, q, qinv
-    ldrsh.w twiddle, [twiddle_ptr, #4]
-    gsbutterflym3 poly4, poly5, twiddle, tmp, q, qinv
-    ldrsh.w twiddle, [twiddle_ptr, #6]
-    gsbutterflym3 poly6, poly7, twiddle, tmp, q, qinv
+    ldr.w twiddle, [twiddle_ptr]
+    gs_butterfly_m3 poly0, poly1, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #4]
+    gs_butterfly_m3 poly2, poly3, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #8]
+    gs_butterfly_m3 poly4, poly5, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #12]
+    gs_butterfly_m3 poly6, poly7, twiddle, q, alpha2, tmp
 
-    ldrsh.w twiddle, [twiddle_ptr, #8]
-    gsbutterflym3 poly0, poly2, twiddle, tmp, q, qinv
-    gsbutterflym3 poly1, poly3, twiddle, tmp, q, qinv
-    ldrsh.w twiddle, [twiddle_ptr, #10]
-    gsbutterflym3 poly4, poly6, twiddle, tmp, q, qinv
-    gsbutterflym3 poly5, poly7, twiddle, tmp, q, qinv
 
-    ldrsh.w twiddle, [twiddle_ptr, #12]
-    gsbutterflym3 poly0, poly4, twiddle, tmp, q, qinv
-    gsbutterflym3 poly1, poly5, twiddle, tmp, q, qinv
-    gsbutterflym3 poly2, poly6, twiddle, tmp, q, qinv
-    gsbutterflym3 poly3, poly7, twiddle, tmp, q, qinv
+    // fullplant poly0, poly2, poly4, poly6, q, alpha2, plantconst
 
-    ldrsh.w twiddle, [twiddle_ptr, #14]
-    fqmulprecompm3 poly0, twiddle, tmp,  q, qinv
-    fqmulprecompm3 poly1, twiddle, tmp,  q, qinv
-    fqmulprecompm3 poly2, twiddle, tmp,  q, qinv
-    fqmulprecompm3 poly3, twiddle, tmp,  q, qinv
+
+    ldr.w twiddle, [twiddle_ptr, #16]
+    gs_butterfly_m3 poly0, poly2, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly1, poly3, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #20]
+    gs_butterfly_m3 poly4, poly6, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly5, poly7, twiddle, q, alpha2, tmp
+
+    ldr.w twiddle, [twiddle_ptr, #24]
+    gs_butterfly_m3 poly0, poly4, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly1, poly5, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly2, poly6, twiddle, q, alpha2, tmp
+    gs_butterfly_m3 poly3, poly7, twiddle, q, alpha2, tmp
+
+    ldr.w twiddle, [twiddle_ptr, #28]
+    // fqmulprecompm3 poly0, twiddle, q, alpha2, tmp
+    // fqmulprecompm3 poly1, twiddle, q, alpha2, tmp
+    // fqmulprecompm3 poly2, twiddle, q, alpha2, tmp
+    // fqmulprecompm3 poly3, twiddle, q, alpha2, tmp
+    plant_mul_const_inplace_m3 q, alpha2, twiddle, poly0
+    plant_mul_const_inplace_m3 q, alpha2, twiddle, poly1
+    plant_mul_const_inplace_m3 q, alpha2, twiddle, poly2
+    plant_mul_const_inplace_m3 q, alpha2, twiddle, poly3
 
     strh.w poly1, [poly, #64]
     strh.w poly2, [poly, #128]

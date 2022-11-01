@@ -1,22 +1,9 @@
+#include "macros.i"
+
 .syntax unified
 .thumb
 
-.macro butterflym3 a0, a1, twiddle, q, qinv, tmp
-    mul.w \a1, \a1, \twiddle
-    mul.w \tmp, \a1, \qinv
-    sxth.w \tmp, \tmp
-    mla.w \tmp, \tmp, \q, \a1
-    sub.w \a1, \a0, \tmp, asr#16
-    add.w \a0, \a0, \tmp, asr#16
-.endm
-
-.macro barrettm3 a, tmp, q, barrettconst
-    mul.w \tmp, \a, \barrettconst
-    asr.w \tmp, \tmp, #26
-    mul.w \tmp, \tmp, \q
-    sub.w \a, \a, \tmp
-.endm
-
+// |input|<0.5q; |output|<3.5q
 .global ntt_fast_m3
 .type ntt_fast_m3, %function
 .align 2
@@ -34,14 +21,11 @@ ntt_fast_m3:
   poly6       .req r8
   poly7       .req r9
   twiddle     .req r10
-  barrettconst .req r10
-  qinv        .req r11
+  alpha2      .req r11
   q           .req r12
   tmp         .req r14
 
-  .equ barrett_constant, 20159
-
-  movw qinv, #3327
+  movw alpha2, #8
   movw q, #3329
 
   ### LAYER 7+6+5
@@ -58,27 +42,27 @@ ntt_fast_m3:
     ldrsh.w poly6, [poly, #384]
     ldrsh.w poly7, [poly, #448]
 
-    ldrsh.w twiddle, [twiddle_ptr]
-    butterflym3 poly0, poly4, twiddle, q, qinv, tmp
-    butterflym3 poly1, poly5, twiddle, q, qinv, tmp
-    butterflym3 poly2, poly6, twiddle, q, qinv, tmp
-    butterflym3 poly3, poly7, twiddle, q, qinv, tmp
+    ldr.w twiddle, [twiddle_ptr]
+    ct_butterfly_m3 poly0, poly4, twiddle, q, alpha2, tmp
+    ct_butterfly_m3 poly1, poly5, twiddle, q, alpha2, tmp
+    ct_butterfly_m3 poly2, poly6, twiddle, q, alpha2, tmp
+    ct_butterfly_m3 poly3, poly7, twiddle, q, alpha2, tmp
 
-    ldrsh.w twiddle, [twiddle_ptr, #2]
-    butterflym3 poly0, poly2, twiddle, q, qinv, tmp
-    butterflym3 poly1, poly3, twiddle, q, qinv, tmp
-    ldrsh.w twiddle, [twiddle_ptr, #4]
-    butterflym3 poly4, poly6, twiddle, q, qinv, tmp
-    butterflym3 poly5, poly7, twiddle, q, qinv, tmp
+    ldr.w twiddle, [twiddle_ptr, #4]
+    ct_butterfly_m3 poly0, poly2, twiddle, q, alpha2, tmp
+    ct_butterfly_m3 poly1, poly3, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #8]
+    ct_butterfly_m3 poly4, poly6, twiddle, q, alpha2, tmp
+    ct_butterfly_m3 poly5, poly7, twiddle, q, alpha2, tmp
 
-    ldrsh.w twiddle, [twiddle_ptr, #6]
-    butterflym3 poly0, poly1, twiddle, q, qinv, tmp
-    ldrsh.w twiddle, [twiddle_ptr, #8]
-    butterflym3 poly2, poly3, twiddle, q, qinv, tmp
-    ldrsh.w twiddle, [twiddle_ptr, #10]
-    butterflym3 poly4, poly5, twiddle, q, qinv, tmp
-    ldrsh.w twiddle, [twiddle_ptr, #12]
-    butterflym3 poly6, poly7, twiddle, q, qinv, tmp
+    ldr.w twiddle, [twiddle_ptr, #12]
+    ct_butterfly_m3 poly0, poly1, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #16]
+    ct_butterfly_m3 poly2, poly3, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #20]
+    ct_butterfly_m3 poly4, poly5, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr, #24]
+    ct_butterfly_m3 poly6, poly7, twiddle, q, alpha2, tmp
 
     strh.w poly1, [poly, #64]
     strh.w poly2, [poly, #128]
@@ -94,7 +78,7 @@ ntt_fast_m3:
   bne.w 1b
 
   sub.w poly, #64
-  add.w twiddle_ptr, #14
+  add.w twiddle_ptr, #14*2
 
   ### LAYER 4+3+2
   movw tmp, #8
@@ -112,28 +96,28 @@ ntt_fast_m3:
       ldrsh.w poly6, [poly, #48]
       ldrsh.w poly7, [poly, #56]
 
-      ldrsh.w twiddle, [twiddle_ptr]
-      butterflym3 poly0, poly4, twiddle, q, qinv, tmp
-      butterflym3 poly1, poly5, twiddle, q, qinv, tmp
-      butterflym3 poly2, poly6, twiddle, q, qinv, tmp
-      butterflym3 poly3, poly7, twiddle, q, qinv, tmp
+      ldr.w twiddle, [twiddle_ptr]
+      ct_butterfly_m3 poly0, poly4, twiddle, q, alpha2, tmp
+      ct_butterfly_m3 poly1, poly5, twiddle, q, alpha2, tmp
+      ct_butterfly_m3 poly2, poly6, twiddle, q, alpha2, tmp
+      ct_butterfly_m3 poly3, poly7, twiddle, q, alpha2, tmp
 
-      ldrsh.w twiddle, [twiddle_ptr, #2]
-      butterflym3 poly0, poly2, twiddle, q, qinv, tmp
-      butterflym3 poly1, poly3, twiddle, q, qinv, tmp
-      ldrsh.w twiddle, [twiddle_ptr, #4]
-      butterflym3 poly4, poly6, twiddle, q, qinv, tmp
-      butterflym3 poly5, poly7, twiddle, q, qinv, tmp
+      ldr.w twiddle, [twiddle_ptr, #4]
+      ct_butterfly_m3 poly0, poly2, twiddle, q, alpha2, tmp
+      ct_butterfly_m3 poly1, poly3, twiddle, q, alpha2, tmp
+      ldr.w twiddle, [twiddle_ptr, #8]
+      ct_butterfly_m3 poly4, poly6, twiddle, q, alpha2, tmp
+      ct_butterfly_m3 poly5, poly7, twiddle, q, alpha2, tmp
 
 
-      ldrsh.w twiddle, [twiddle_ptr, #6]
-      butterflym3 poly0, poly1, twiddle, q, qinv, tmp
-      ldrsh.w twiddle, [twiddle_ptr, #8]
-      butterflym3 poly2, poly3, twiddle, q, qinv, tmp
-      ldrsh.w twiddle, [twiddle_ptr, #10]
-      butterflym3 poly4, poly5, twiddle, q, qinv, tmp
-      ldrsh.w twiddle, [twiddle_ptr, #12]
-      butterflym3 poly6, poly7, twiddle, q, qinv, tmp
+      ldr.w twiddle, [twiddle_ptr, #12]
+      ct_butterfly_m3 poly0, poly1, twiddle, q, alpha2, tmp
+      ldr.w twiddle, [twiddle_ptr, #16]
+      ct_butterfly_m3 poly2, poly3, twiddle, q, alpha2, tmp
+      ldr.w twiddle, [twiddle_ptr, #20]
+      ct_butterfly_m3 poly4, poly5, twiddle, q, alpha2, tmp
+      ldr.w twiddle, [twiddle_ptr, #24]
+      ct_butterfly_m3 poly6, poly7, twiddle, q, alpha2, tmp
 
       strh.w poly1, [poly, #8]
       strh.w poly2, [poly, #16]
@@ -149,7 +133,7 @@ ntt_fast_m3:
       .endif
       .set k, k+1
     .endr
-    add.w twiddle_ptr, #14
+    add.w twiddle_ptr, #14*2
 
     pop.w {tmp}
     subs.w tmp, #1
@@ -172,22 +156,12 @@ ntt_fast_m3:
     ldrsh.w poly6, [poly,#12]
     ldrsh.w poly7, [poly,#14]
 
-    ldrsh.w twiddle, [twiddle_ptr], #2
-    butterflym3 poly0, poly2, twiddle, q, qinv, tmp
-    butterflym3 poly1, poly3, twiddle, q, qinv, tmp
-    ldrsh.w twiddle, [twiddle_ptr], #2
-    butterflym3 poly4, poly6, twiddle, q, qinv, tmp
-    butterflym3 poly5, poly7, twiddle, q, qinv, tmp
-
-    movw barrettconst, #barrett_constant
-    barrettm3 poly0, tmp, q, barrettconst
-    barrettm3 poly1, tmp, q, barrettconst
-    barrettm3 poly2, tmp, q, barrettconst
-    barrettm3 poly3, tmp, q, barrettconst
-    barrettm3 poly4, tmp, q, barrettconst
-    barrettm3 poly5, tmp, q, barrettconst
-    barrettm3 poly6, tmp, q, barrettconst
-    barrettm3 poly7, tmp, q, barrettconst
+    ldr.w twiddle, [twiddle_ptr], #4
+    ct_butterfly_m3 poly0, poly2, twiddle, q, alpha2, tmp
+    ct_butterfly_m3 poly1, poly3, twiddle, q, alpha2, tmp
+    ldr.w twiddle, [twiddle_ptr], #4
+    ct_butterfly_m3 poly4, poly6, twiddle, q, alpha2, tmp
+    ct_butterfly_m3 poly5, poly7, twiddle, q, alpha2, tmp
 
     strh.w poly1, [poly,#2]
     strh.w poly2, [poly,#4]
