@@ -38,5 +38,4 @@
 %M3 results for crypto_kem_kyber1024_m3fspeed (type=kem)
 \DefineVar{crypto_kem_kyber1024_m3fspeedkeygen}{1\,333k}
 \DefineVar{crypto_kem_kyber1024_m3fspeedencaps}{1\,548k}
-\DefineVar{crypto_kem_kyber1024_m3fspeeddecaps}{1\,471k}% Benchmarking measurements written on 2023-03-15 13:20:22.309301+00:00; iterations=100
-
+\DefineVar{crypto_kem_kyber1024_m3fspeeddecaps}{1\,471k}

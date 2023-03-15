@@ -51,7 +51,7 @@ def run_bench(scheme_path, scheme_name, scheme_type, iterations):
             sys.stdout.buffer.write(device_output)
             sys.stdout.flush()
             log += device_output
-            if device_output == b'#':
+            if device_output == b'+':
                 logs.append(log)
                 log = b""
                 iteration += 1
