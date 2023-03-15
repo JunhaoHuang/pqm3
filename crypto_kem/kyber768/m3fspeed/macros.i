@@ -2,7 +2,7 @@
 #define MACROS_I
 
 // a*b*qinv*plantconst; result in the bottom half of a
-.macro plant_mul_const_inplace_m3 q, alpha2, bq, a
+.macro plant_mul_const_inplace q, alpha2, bq, a
   mul.w \a, \a, \bq
   add.w \a, \alpha2, \a, asr#16
   mul.w \a, \a, \q
@@ -10,7 +10,7 @@
 .endm
 
 // a*b*qinv*plantconst; result in the bottom half of a
-.macro plant_mul_const_m3 q, alpha2, bq, a, res
+.macro plant_mul_const q, alpha2, bq, a, res
   mul.w \res, \a, \bq
   add.w \res, \alpha2, \res, asr#16
   mul.w \res, \res, \q
@@ -18,7 +18,7 @@
 .endm
 
 // each layer increases coefficients by 0.5q
-.macro ct_butterfly_m3 a0, a1, twiddle, q, alpha2, tmp
+.macro ct_butterfly a0, a1, twiddle, q, alpha2, tmp
   mul.w \a1, \a1, \twiddle
   add.w \a1, \alpha2, \a1, asr#16
   mul.w \tmp, \a1, \q
@@ -26,7 +26,7 @@
   add.w \a0, \a0, \tmp, asr#16
 .endm
 
-.macro gs_butterfly_m3 a0, a1, twiddle, q, alpha2, tmp
+.macro gs_butterfly a0, a1, twiddle, q, alpha2, tmp
   sub.w \tmp, \a0, \a1
   add.w \a0, \a0, \a1
   mul.w \a1, \tmp, \twiddle
@@ -36,7 +36,7 @@
 .endm
 
 // output (-0.5q, 0.5q)
-.macro plant_red_m3 q, alpha2, qinv, a 
+.macro plant_red q, alpha2, qinv, a 
   mul.w \a, \a, \qinv
   add.w \a, \alpha2, \a, asr#16
   mul.w \a, \a, \q
@@ -44,7 +44,7 @@
 .endm
 
 // output (0, q)
-.macro barrett_red_m3 a, tmp, q, barrettconst
+.macro barrett_red a, tmp, q, barrettconst
   mul.w \tmp, \a, \barrettconst
   asr.w \tmp, \tmp, #26
   mul.w \tmp, \tmp, \q

@@ -1,7 +1,19 @@
-#include "macros.i"
-
 .syntax unified
 .thumb
+
+.macro barrettm3 a, tmp, q, barrettconst
+    mul.w \tmp, \a, \barrettconst
+    asr.w \tmp, \tmp, #26
+    mul.w \tmp, \tmp, \q
+    sub.w \a, \a, \tmp
+.endm
+
+.macro montgomerym3 q, qinv, a, tmp
+  mul.w \tmp, \a, \qinv
+  sxth.w \tmp, \tmp
+  mla.w \a, \tmp, \q, \a
+  asr.w \a, \a, #16
+.endm
 
 .align 2
 .global pointwise_sub_m3
@@ -82,7 +94,7 @@ pointwise_add_m3:
   strh.w r3, [r0]
   pop.w {r4-r11, pc}
 
-.global asm_barrett_reduce_m3
+  .global asm_barrett_reduce_m3
 .type asm_barrett_reduce_m3,%function
 .align 2
 asm_barrett_reduce_m3:
@@ -118,15 +130,15 @@ asm_barrett_reduce_m3:
     ldrsh.w poly7, [poly, #14]
     ldrsh.w poly8, [poly, #16]
 
-    barrett_red_m3 poly0, tmp, q, barrettconst
-    barrett_red_m3 poly1, tmp, q, barrettconst
-    barrett_red_m3 poly2, tmp, q, barrettconst
-    barrett_red_m3 poly3, tmp, q, barrettconst
-    barrett_red_m3 poly4, tmp, q, barrettconst
-    barrett_red_m3 poly5, tmp, q, barrettconst
-    barrett_red_m3 poly6, tmp, q, barrettconst
-    barrett_red_m3 poly7, tmp, q, barrettconst
-    barrett_red_m3 poly8, tmp, q, barrettconst
+    barrettm3 poly0, tmp, q, barrettconst
+    barrettm3 poly1, tmp, q, barrettconst
+    barrettm3 poly2, tmp, q, barrettconst
+    barrettm3 poly3, tmp, q, barrettconst
+    barrettm3 poly4, tmp, q, barrettconst
+    barrettm3 poly5, tmp, q, barrettconst
+    barrettm3 poly6, tmp, q, barrettconst
+    barrettm3 poly7, tmp, q, barrettconst
+    barrettm3 poly8, tmp, q, barrettconst
 
     strh.w poly1, [poly, #2]
     strh.w poly2, [poly, #4]
@@ -144,10 +156,10 @@ asm_barrett_reduce_m3:
   ldrsh.w poly1, [poly, #2]
   ldrsh.w poly2, [poly, #4]
   ldrsh.w poly3, [poly, #6]
-  barrett_red_m3 poly0, tmp, q, barrettconst
-  barrett_red_m3 poly1, tmp, q, barrettconst
-  barrett_red_m3 poly2, tmp, q, barrettconst
-  barrett_red_m3 poly3, tmp, q, barrettconst
+  barrettm3 poly0, tmp, q, barrettconst
+  barrettm3 poly1, tmp, q, barrettconst
+  barrettm3 poly2, tmp, q, barrettconst
+  barrettm3 poly3, tmp, q, barrettconst
   strh.w poly0, [poly, #0]
   strh.w poly1, [poly, #2]
   strh.w poly2, [poly, #4]
@@ -156,10 +168,10 @@ asm_barrett_reduce_m3:
 
 
 
-.global asm_fromplant_m3
-.type asm_fromplant_m3,%function
+.global asm_frommont_m3
+.type asm_frommont_m3,%function
 .align 2
-asm_fromplant_m3:
+asm_frommont_m3:
   push.w    {r4-r11, r14}
 
   poly        .req r0
@@ -172,17 +184,15 @@ asm_fromplant_m3:
   poly6       .req r7
   poly7       .req r8
   loop        .req r9
-  plantconst  .req r10
-  alpha2      .req r14
+  constant    .req r10
+  qinv        .req r14
   q           .req r11
   tmp         .req r12
 
-  movw alpha2, #8
   movw q, #3329
+  movw qinv, #3327
 
-  ### plant_constant=(Plant_const^2%M)*(p^-1) % 2^32
-  movw plantconst, #20396
-  movt plantconst, #38900
+  movw constant, #1353
 
 movw loop, #32
   1:
@@ -195,14 +205,22 @@ movw loop, #32
     ldrsh.w poly6, [poly, #12]
     ldrsh.w poly7, [poly, #14]
 
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly0
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly1
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly2
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly3
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly4
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly5
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly6
-    plant_mul_const_inplace_m3 q, alpha2, plantconst, poly7
+    mul.w poly0, poly0, constant
+    mul.w poly1, poly1, constant
+    mul.w poly2, poly2, constant
+    mul.w poly3, poly3, constant
+    mul.w poly4, poly4, constant
+    mul.w poly5, poly5, constant
+    mul.w poly6, poly6, constant
+    mul.w poly7, poly7, constant
+    montgomerym3 q, qinv, poly0, tmp
+    montgomerym3 q, qinv, poly1, tmp
+    montgomerym3 q, qinv, poly2, tmp
+    montgomerym3 q, qinv, poly3, tmp
+    montgomerym3 q, qinv, poly4, tmp
+    montgomerym3 q, qinv, poly5, tmp
+    montgomerym3 q, qinv, poly6, tmp
+    montgomerym3 q, qinv, poly7, tmp
 
     strh.w poly1, [poly, #2]
     strh.w poly2, [poly, #4]
@@ -212,7 +230,6 @@ movw loop, #32
     strh.w poly6, [poly, #12]
     strh.w poly7, [poly, #14]
     strh.w poly0, [poly], #16
-    
 
     subs.w loop, #1
   bne.w 1b
@@ -231,8 +248,7 @@ movw loop, #32
   .unreq poly6
   .unreq poly7
   .unreq q
-  .unreq alpha2
-  .unreq plantconst
+  .unreq qinv
   .unreq tmp
   .unreq loop
 
@@ -243,40 +259,39 @@ movw loop, #32
 doublebasemul_asm_m3:
   push.w {r4-r11, lr}
 
-  rptr    .req r0
-  aptr    .req r1
-  bptr    .req r2
-  zeta    .req r3
-  poly0   .req r4
-  poly1   .req r6
-  poly2   .req r5
-  poly3   .req r7
-  q       .req r8
-  alpha2  .req r9
-  qinv    .req r10
-  tmp     .req r11
+  rptr  .req r0
+  aptr  .req r1
+  bptr  .req r2
+  zeta  .req r3
+  poly0 .req r4
+  poly1 .req r6
+  poly2 .req r5
+  poly3 .req r7
+  q     .req r8
+  qinv  .req r14
+  tmp   .req r9
+  tmp2  .req r10
 
   movw.w  q, #3329
-  ### qinv=0x6ba8f301
-  movw qinv, #62209
-  movt qinv, #27560
-  mov.w alpha2, #8
+  movw.w qinv, #3327
 
   ldrsh.w poly0, [aptr, #0]
   ldrsh.w poly1, [aptr, #2]
   ldrsh.w poly2, [bptr, #0]
   ldrsh.w poly3, [bptr, #2]
 
-  plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-  mul.w tmp, tmp, poly3
+  mul.w tmp, poly1, poly3
+  montgomerym3 q, qinv, tmp, tmp2
+  mul.w tmp, tmp, zeta
   mla.w tmp, poly0, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   strh.w tmp, [rptr, #0]
 
   mul.w tmp, poly0, poly3
   mla.w tmp, poly1, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   strh.w tmp, [rptr, #2]
+
 
   neg.w zeta, zeta
 
@@ -285,18 +300,21 @@ doublebasemul_asm_m3:
   ldrsh.w poly2, [bptr, #4]
   ldrsh.w poly3, [bptr, #6]
 
-  plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-  mul.w tmp, tmp, poly3
+  mul.w tmp, poly1, poly3
+  montgomerym3 q, qinv, tmp, tmp2
+  mul.w tmp, tmp, zeta
   mla.w tmp, poly0, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   strh.w tmp, [rptr, #4]
 
   mul.w tmp, poly0, poly3
   mla.w tmp, poly1, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   strh.w tmp, [rptr, #6]
 
   pop.w {r4-r11, pc}
+
+.unreq qinv
 
 .global doublebasemul_asm_acc_m3
 .type doublebasemul_asm_acc_m3, %function
@@ -304,26 +322,23 @@ doublebasemul_asm_m3:
 doublebasemul_asm_acc_m3:
   push.w {r4-r11, lr}
 
-  rptr    .req r0
-  aptr    .req r1
-  bptr    .req r2
-  zeta    .req r3
-  poly0   .req r4
-  poly1   .req r6
-  poly2   .req r5
-  poly3   .req r7
-  q       .req r8
-  alpha2  .req r9
-  qinv    .req r10
-  tmp     .req r11
-  res0    .req r12
-  res1    .req r14
+  rptr  .req r0
+  aptr  .req r1
+  bptr  .req r2
+  zeta  .req r3
+  poly0 .req r4
+  poly1 .req r6
+  poly2 .req r5
+  poly3 .req r7
+  q     .req r8
+  qinv  .req r11
+  tmp   .req r9
+  tmp2  .req r10
+  res0  .req r12
+  res1  .req r14
 
-  movw.w  q, #3329
-  ### qinv=0x6ba8f301
-  movw qinv, #62209
-  movt qinv, #27560
-  mov.w alpha2, #8
+  movw  q, #3329
+  movw qinv, #3327
 
   ldrsh.w poly0, [aptr, #0]
   ldrsh.w poly1, [aptr, #2]
@@ -332,16 +347,17 @@ doublebasemul_asm_acc_m3:
   ldrsh.w res0, [rptr, #0]
   ldrsh.w res1, [rptr, #2]
 
-  plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-  mul.w tmp, tmp, poly3
+  mul.w tmp, poly1, poly3
+  montgomerym3 q, qinv, tmp, tmp2
+  mul.w tmp, tmp, zeta
   mla.w tmp, poly0, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   add.w res0, res0, tmp
   strh.w res0, [rptr, #0]
 
   mul.w tmp, poly0, poly3
   mla.w tmp, poly1, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   add.w res1, res1, tmp
   strh.w res1, [rptr, #2]
 
@@ -354,170 +370,168 @@ doublebasemul_asm_acc_m3:
   ldrsh.w res0, [rptr, #4]
   ldrsh.w res1, [rptr, #6]
 
-  plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-  mul.w tmp, tmp, poly3
+  mul.w tmp, poly1, poly3
+  montgomerym3 q, qinv, tmp, tmp2
+  mul.w tmp, tmp, zeta
   mla.w tmp, poly0, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   add.w res0, res0, tmp
   strh.w res0, [rptr, #4]
 
   mul.w tmp, poly0, poly3
   mla.w tmp, poly1, poly2, tmp
-  plant_red_m3 q, alpha2, qinv, tmp
+  montgomerym3 q, qinv, tmp, tmp2
   add.w res1, res1, tmp
   strh.w res1, [rptr, #6]
 
   pop.w {r4-r11, pc}
 
-
+.unreq qinv
 .global basemul_asm_m3
 .type basemul_asm_m3, %function
 .align 2
 basemul_asm_m3:
-  push.w {r4-r11, lr}
+    push.w {r4-r11, lr}
 
-  .unreq zeta
-  rptr    .req r0
-  aptr    .req r1
-  bptr    .req r2
-  zetaptr .req r3
-  poly0   .req r4
-  poly1   .req r6
-  poly2   .req r5
-  poly3   .req r7
-  q       .req r8
-  alpha2  .req r9
-  qinv    .req r10
-  tmp     .req r11
-  zeta    .req r12
-  loop    .req r14
+    .unreq zeta
+    rptr    .req r0
+    aptr    .req r1
+    bptr    .req r2
+    zetaptr .req r3
+    poly0   .req r4
+    poly1   .req r6
+    poly2   .req r5
+    poly3   .req r7
+    q       .req r8
+    qinv    .req r11
+    tmp     .req r9
+    tmp2    .req r10
+    zeta    .req r12
+    loop    .req r14
 
-  movw.w  q, #3329
-  ### qinv=0x6ba8f301
-  movw qinv, #62209
-  movt qinv, #27560
-  mov.w alpha2, #8
+    movw q, #3329
+    movw qinv, #3327
 
-  movw loop, #64
-  1:
-    ldr.w zeta, [zetaptr], #4
+    movw loop, #64
+    1:
+      ldrsh.w zeta, [zetaptr], #2
 
-    ldrsh.w poly1, [aptr,  #2]
-    ldrsh.w poly0, [aptr], #4
-    ldrsh.w poly3, [bptr, #2]
-    ldrsh.w poly2, [bptr], #4
+      ldrsh.w poly1, [aptr,  #2]
+      ldrsh.w poly0, [aptr], #4
+      ldrsh.w poly3, [bptr, #2]
+      ldrsh.w poly2, [bptr], #4
 
-    plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-    mul.w tmp, tmp, poly3
-    mla.w tmp, poly0, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    strh.w tmp, [rptr], #2
+      mul.w tmp, poly1, poly3
+      montgomerym3 q, qinv, tmp, tmp2
+      mul.w tmp, tmp, zeta
+      mla.w tmp, poly0, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    mul.w tmp, poly0, poly3
-    mla.w tmp, poly1, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    strh.w tmp, [rptr], #2
+      mul.w tmp, poly0, poly3
+      mla.w tmp, poly1, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    neg.w zeta, zeta
+      neg.w zeta, zeta
 
-    ldrsh.w poly1, [aptr,  #2]
-    ldrsh.w poly0, [aptr], #4
-    ldrsh.w poly3, [bptr, #2]
-    ldrsh.w poly2, [bptr], #4
+      ldrsh.w poly1, [aptr,  #2]
+      ldrsh.w poly0, [aptr], #4
+      ldrsh.w poly3, [bptr, #2]
+      ldrsh.w poly2, [bptr], #4
 
-    plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-    mul.w tmp, tmp, poly3
-    mla.w tmp, poly0, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    strh.w tmp, [rptr], #2
+      mul.w tmp, poly1, poly3
+      montgomerym3 q, qinv, tmp, tmp2
+      mul.w tmp, tmp, zeta
+      mla.w tmp, poly0, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    mul.w tmp, poly0, poly3
-    mla.w tmp, poly1, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    strh.w tmp, [rptr], #2
+      mul.w tmp, poly0, poly3
+      mla.w tmp, poly1, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    subs.w loop, #1
-  bne.w 1b
+      subs.w loop, #1
+    bne.w 1b
 
-  pop.w {r4-r11, pc}
+    pop.w {r4-r11, pc}
+
+.unreq qinv
 
 .global basemul_asm_acc_m3
 .type basemul_asm_acc_m3, %function
 .align 2
 basemul_asm_acc_m3:
-  push.w {r4-r11, lr}
+    push.w {r4-r11, lr}
 
-  rptr    .req r0
-  aptr    .req r1
-  bptr    .req r2
-  zetaptr .req r3
-  poly0   .req r4
-  poly1   .req r6
-  poly2   .req r5
-  poly3   .req r7
-  q       .req r8
-  alpha2  .req r9
-  qinv    .req r10
-  tmp     .req r11
-  zeta    .req r12
-  loop    .req r14
-  res     .req r14
+    rptr    .req r0
+    aptr    .req r1
+    bptr    .req r2
+    zetaptr .req r3
+    poly0   .req r4
+    poly1   .req r6
+    poly2   .req r5
+    poly3   .req r7
+    q       .req r8
+    qinv    .req r11
+    tmp     .req r9
+    tmp2    .req r10
+    zeta    .req r12
+    loop    .req r14
 
-  movw.w  q, #3329
-  ### qinv=0x6ba8f301
-  movw qinv, #62209
-  movt qinv, #27560
-  mov.w alpha2, #8
+    movw q, #3329
+    movw qinv, #3327
 
-  movw loop, #64
-  1:
-    push.w {loop}
-    ldr.w zeta, [zetaptr], #4
+    movw loop, #64
+    1:
+      ldrsh.w zeta, [zetaptr], #2
 
-    ldrsh.w poly1, [aptr,  #2]
-    ldrsh.w poly0, [aptr], #4
-    ldrsh.w poly3, [bptr, #2]
-    ldrsh.w poly2, [bptr], #4
+      ldrsh.w poly1, [aptr,  #2]
+      ldrsh.w poly0, [aptr], #4
+      ldrsh.w poly3, [bptr, #2]
+      ldrsh.w poly2, [bptr], #4
 
-    plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-    mul.w tmp, tmp, poly3
-    mla.w tmp, poly0, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    ldrsh.w res, [rptr]
-    add.w res, res, tmp
-    strh.w res, [rptr], #2
+      mul.w tmp, poly1, poly3
+      montgomerym3 q, qinv, tmp, tmp2
+      mul.w tmp, tmp, zeta
+      mla.w tmp, poly0, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      ldrsh.w tmp2, [rptr]
+      add.w tmp, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    mul.w tmp, poly0, poly3
-    mla.w tmp, poly1, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    ldrsh.w res, [rptr]
-    add.w res, res, tmp
-    strh.w res, [rptr], #2
+      mul.w tmp, poly0, poly3
+      mla.w tmp, poly1, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      ldrsh.w tmp2, [rptr]
+      add.w tmp, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    neg.w zeta, zeta
+      neg.w zeta, zeta
 
-    ldrsh.w poly1, [aptr,  #2]
-    ldrsh.w poly0, [aptr], #4
-    ldrsh.w poly3, [bptr, #2]
-    ldrsh.w poly2, [bptr], #4
+      ldrsh.w poly1, [aptr,  #2]
+      ldrsh.w poly0, [aptr], #4
+      ldrsh.w poly3, [bptr, #2]
+      ldrsh.w poly2, [bptr], #4
 
-    plant_mul_const_m3 q, alpha2, zeta, poly1, tmp
-    mul.w tmp, tmp, poly3
-    mla.w tmp, poly0, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    ldrsh.w res, [rptr]
-    add.w res, res, tmp
-    strh.w res, [rptr], #2
+      mul.w tmp, poly1, poly3
+      montgomerym3 q, qinv, tmp, tmp2
+      mul.w tmp, tmp, zeta
+      mla.w tmp, poly0, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      ldrsh.w tmp2,[rptr]
+      add.w tmp, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    mul.w tmp, poly0, poly3
-    mla.w tmp, poly1, poly2, tmp
-    plant_red_m3 q, alpha2, qinv, tmp
-    ldrsh.w res, [rptr]
-    add.w res, res, tmp
-    strh.w res, [rptr], #2
+      mul.w tmp, poly0, poly3
+      mla.w tmp, poly1, poly2, tmp
+      montgomerym3 q, qinv, tmp, tmp2
+      ldrsh.w tmp2,[rptr]
+      add.w tmp, tmp, tmp2
+      strh.w tmp, [rptr], #2
 
-    pop.w {loop}
-    subs.w loop, #1
-  bne.w 1b
+      subs.w loop, #1
+    bne.w 1b
 
-  pop.w {r4-r11, pc}
+    pop.w {r4-r11, pc}

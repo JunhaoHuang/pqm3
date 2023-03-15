@@ -1,0 +1,94 @@
+% Stack Benchmarking measurements written on 2023-03-03 14:15:37.448708+00:00;
+
+%M3 results for crypto_kem_kyber512_m3 (type=kem)
+\DefineVar{crypto_kem_kyber512_m3keygen_stack_usage}{2\,212}
+\DefineVar{crypto_kem_kyber512_m3encaps_stack_usage}{2\,300}
+\DefineVar{crypto_kem_kyber512_m3decaps_stack_usage}{2\,308}
+
+%M3 results for crypto_kem_kyber512_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber512_m3fspeedkeygen_stack_usage}{3\,268}
+\DefineVar{crypto_kem_kyber512_m3fspeedencaps_stack_usage}{3\,860}
+\DefineVar{crypto_kem_kyber512_m3fspeeddecaps_stack_usage}{3\,860}
+
+%M3 results for crypto_kem_kyber512_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber512_m3fstackkeygen_stack_usage}{2\,212}
+\DefineVar{crypto_kem_kyber512_m3fstackencaps_stack_usage}{2\,300}
+\DefineVar{crypto_kem_kyber512_m3fstackdecaps_stack_usage}{2\,308}
+
+%M3 results for crypto_kem_kyber768_m3 (type=kem)
+\DefineVar{crypto_kem_kyber768_m3keygen_stack_usage}{3\,084}
+\DefineVar{crypto_kem_kyber768_m3encaps_stack_usage}{2\,772}
+\DefineVar{crypto_kem_kyber768_m3decaps_stack_usage}{2\,788}
+
+%M3 results for crypto_kem_kyber768_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber768_m3fspeedkeygen_stack_usage}{4\,044}
+\DefineVar{crypto_kem_kyber768_m3fspeedencaps_stack_usage}{4\,636}
+\DefineVar{crypto_kem_kyber768_m3fspeeddecaps_stack_usage}{4\,636}
+
+%M3 results for crypto_kem_kyber768_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber768_m3fstackkeygen_stack_usage}{3\,084}
+\DefineVar{crypto_kem_kyber768_m3fstackencaps_stack_usage}{2\,772}
+\DefineVar{crypto_kem_kyber768_m3fstackdecaps_stack_usage}{2\,788}
+
+%M3 results for crypto_kem_kyber1024_m3 (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3keygen_stack_usage}{3\,596}
+\DefineVar{crypto_kem_kyber1024_m3encaps_stack_usage}{3\,284}
+\DefineVar{crypto_kem_kyber1024_m3decaps_stack_usage}{3\,300}
+
+%M3 results for crypto_kem_kyber1024_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3fspeedkeygen_stack_usage}{4\,812}
+\DefineVar{crypto_kem_kyber1024_m3fspeedencaps_stack_usage}{5\,404}
+\DefineVar{crypto_kem_kyber1024_m3fspeeddecaps_stack_usage}{5\,404}
+
+%M3 results for crypto_kem_kyber1024_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3fstackkeygen_stack_usage}{3\,596}
+\DefineVar{crypto_kem_kyber1024_m3fstackencaps_stack_usage}{3\,284}
+\DefineVar{crypto_kem_kyber1024_m3fstackdecaps_stack_usage}{3\,300}
+
+% Stack Benchmarking measurements written on 2023-03-05 06:34:44.437356+00:00;
+
+%M3 results for crypto_kem_kyber512_m3 (type=kem)
+\DefineVar{crypto_kem_kyber512_m3keygen_stack_usage}{2\,212}
+\DefineVar{crypto_kem_kyber512_m3encaps_stack_usage}{2\,300}
+\DefineVar{crypto_kem_kyber512_m3decaps_stack_usage}{2\,308}
+
+%M3 results for crypto_kem_kyber512_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber512_m3fspeedkeygen_stack_usage}{3\,268}
+\DefineVar{crypto_kem_kyber512_m3fspeedencaps_stack_usage}{3\,860}
+\DefineVar{crypto_kem_kyber512_m3fspeeddecaps_stack_usage}{3\,860}
+
+%M3 results for crypto_kem_kyber512_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber512_m3fstackkeygen_stack_usage}{2\,212}
+\DefineVar{crypto_kem_kyber512_m3fstackencaps_stack_usage}{2\,300}
+\DefineVar{crypto_kem_kyber512_m3fstackdecaps_stack_usage}{2\,308}
+
+%M3 results for crypto_kem_kyber768_m3 (type=kem)
+\DefineVar{crypto_kem_kyber768_m3keygen_stack_usage}{3\,084}
+\DefineVar{crypto_kem_kyber768_m3encaps_stack_usage}{2\,772}
+\DefineVar{crypto_kem_kyber768_m3decaps_stack_usage}{2\,788}
+
+%M3 results for crypto_kem_kyber768_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber768_m3fspeedkeygen_stack_usage}{4\,044}
+\DefineVar{crypto_kem_kyber768_m3fspeedencaps_stack_usage}{4\,636}
+\DefineVar{crypto_kem_kyber768_m3fspeeddecaps_stack_usage}{4\,636}
+
+%M3 results for crypto_kem_kyber768_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber768_m3fstackkeygen_stack_usage}{3\,084}
+\DefineVar{crypto_kem_kyber768_m3fstackencaps_stack_usage}{2\,772}
+\DefineVar{crypto_kem_kyber768_m3fstackdecaps_stack_usage}{2\,788}
+
+%M3 results for crypto_kem_kyber1024_m3 (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3keygen_stack_usage}{3\,596}
+\DefineVar{crypto_kem_kyber1024_m3encaps_stack_usage}{3\,284}
+\DefineVar{crypto_kem_kyber1024_m3decaps_stack_usage}{3\,300}
+
+%M3 results for crypto_kem_kyber1024_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3fspeedkeygen_stack_usage}{4\,812}
+\DefineVar{crypto_kem_kyber1024_m3fspeedencaps_stack_usage}{5\,404}
+\DefineVar{crypto_kem_kyber1024_m3fspeeddecaps_stack_usage}{5\,404}
+
+%M3 results for crypto_kem_kyber1024_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3fstackkeygen_stack_usage}{3\,596}
+\DefineVar{crypto_kem_kyber1024_m3fstackencaps_stack_usage}{3\,284}
+\DefineVar{crypto_kem_kyber1024_m3fstackdecaps_stack_usage}{3\,300}
+
