@@ -121,15 +121,17 @@ with open(f"stack_benchmarks.txt", "a") as outfile:
     # subprocess.check_call(f"make clean", shell=True)
 
     for scheme_path in [
-        "crypto_kem/kyber512/m3",
-        "crypto_kem/kyber512/m3fspeed",
-        "crypto_kem/kyber512/m3fstack",
-        "crypto_kem/kyber768/m3",
-        "crypto_kem/kyber768/m3fspeed",
-        "crypto_kem/kyber768/m3fstack",
-        "crypto_kem/kyber1024/m3",
-        "crypto_kem/kyber1024/m3fspeed",
-        "crypto_kem/kyber1024/m3fstack"
+        # "crypto_kem/kyber512/m3",
+        # "crypto_kem/kyber512/m3fspeed",
+        # "crypto_kem/kyber512/m3fstack",
+        # "crypto_kem/kyber768/m3",
+        # "crypto_kem/kyber768/m3fspeed",
+        # "crypto_kem/kyber768/m3fstack",
+        # "crypto_kem/kyber1024/m3",
+        # "crypto_kem/kyber1024/m3fspeed",
+        # "crypto_kem/kyber1024/m3fstack",
+        "crypto_sign/dilithium2/m3",
+        "crypto_sign/dilithium2/m3plant"
     ]:
         scheme_name = scheme_path.replace("/", "_")
         scheme_type = re.search('crypto_(.*?)_', scheme_name).group(1)

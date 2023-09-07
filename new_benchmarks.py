@@ -79,7 +79,9 @@ def parseLogSpeed(log, ignoreErrors):
     return cleanNullTerms({
         f"keygen":  get(lines, "keypair cycles:"),
         f"encaps":  get(lines, "encaps cycles:"),
-        f"decaps":  get(lines, "decaps cycles:")
+        f"decaps":  get(lines, "decaps cycles:"),
+        f"sign":  get(lines, "sign cycles:"),
+        f"verify":  get(lines, "verify cycles:")
     })
 
 def average(results):
@@ -113,22 +115,24 @@ def bench(scheme_path, scheme_name, scheme_type, iterations, outfile, ignoreErro
 with open(f"benchmarks.txt", "a") as outfile:
 
     now = datetime.datetime.now(datetime.timezone.utc)
-    iterations = 100 # defines the number of measurements to perform
+    iterations = 10000 # defines the number of measurements to perform
     print(f"% Benchmarking measurements written on {now}; iterations={iterations}\n", file=outfile)
 
     # subprocess.check_call(f"make clean", shell=True)
 
     # uncomment the scheme variants that should be build and evaluated
     for scheme_path in [
-        "crypto_kem/kyber512/m3",
-        "crypto_kem/kyber512/m3fspeed",
-        "crypto_kem/kyber512/m3fstack",
-        "crypto_kem/kyber768/m3",
-        "crypto_kem/kyber768/m3fspeed",
-        "crypto_kem/kyber768/m3fstack",
-        "crypto_kem/kyber1024/m3",
-        "crypto_kem/kyber1024/m3fspeed",
-        "crypto_kem/kyber1024/m3fstack"
+        # "crypto_kem/kyber512/m3",
+        # "crypto_kem/kyber512/m3fspeed",
+        # "crypto_kem/kyber512/m3fstack",
+        # "crypto_kem/kyber768/m3",
+        # "crypto_kem/kyber768/m3fspeed",
+        # "crypto_kem/kyber768/m3fstack",
+        # "crypto_kem/kyber1024/m3",
+        # "crypto_kem/kyber1024/m3fspeed",
+        # "crypto_kem/kyber1024/m3fstack",
+        "crypto_sign/dilithium2/m3",
+        "crypto_sign/dilithium2/m3plant"
     ]:
         scheme_name = scheme_path.replace("/", "_")
         scheme_type = re.search('crypto_(.*?)_', scheme_name).group(1)

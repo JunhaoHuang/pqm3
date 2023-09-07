@@ -83,6 +83,20 @@ def parseLogSpeed(log, ignoreErrors):
         f"poly_basemul_opt_16_32":  get(lines, "poly_basemul_opt_16_32 cycles:"),
         f"poly_basemul_acc_opt_32_32":  get(lines, "poly_basemul_acc_opt_32_32 cycles:"),
         f"poly_basemul_acc_opt_32_16":  get(lines, "poly_basemul_acc_opt_32_16 cycles:"),
+        f"ntt_leaktime":  get(lines, "ntt leaktime cycles:"),
+        f"invntt_leaktime":  get(lines, "invntt leaktime cycles:"),
+        f"basemul_leaktime":  get(lines, "basemul leaktime cycles:"),
+        f"cs1_32ntt":  get(lines, "cs1 with 32-bit NTT cycles:"),
+        f"cs2_32ntt":  get(lines, "cs2 with 32-bit NTT cycles:"),
+        f"ct0_con_var_32ntt":  get(lines, "ct0 part-constant part-variable with 32-bit NTT cycles:"),
+        f"ct1_var_32ntt":  get(lines, "ct1 variable time with 32-bit NTT cycles:"),
+        f"multi_moduli_ntt":  get(lines, "multi-moduli ntt cycles:"),
+        f"multi_moduli_ntt_precomp":  get(lines, "multi-moduli ntt precomp cycles:"),
+        f"poly_double_basemul_invntt":  get(lines, "multi-moduli basemul+intt cycles:"),
+        f"double_CRT":  get(lines, "multi-moduli double crt cycles:"),
+        f"cs1_16ntt":  get(lines, "cs1 small NTT cycles:"),
+        f"cs2_16ntt":  get(lines, "cs2 small NTT cycles:"),
+        f"ct0_multi_moduli_ntt":  get(lines, "ct0 double NTT cycles:"),
     })
 
 def average(results):
@@ -123,15 +137,17 @@ with open(f"poly_benchmarks.txt", "a") as outfile:
 
     # uncomment the scheme variants that should be build and evaluated
     for scheme_path in [
-        "crypto_kem/kyber512/m3",
-        "crypto_kem/kyber512/m3fspeed",
-        "crypto_kem/kyber512/m3fstack",
-        "crypto_kem/kyber768/m3",
-        "crypto_kem/kyber768/m3fspeed",
-        "crypto_kem/kyber768/m3fstack",
-        "crypto_kem/kyber1024/m3",
-        "crypto_kem/kyber1024/m3fspeed",
-        "crypto_kem/kyber1024/m3fstack"
+        # "crypto_kem/kyber512/m3",
+        # "crypto_kem/kyber512/m3fspeed",
+        # "crypto_kem/kyber512/m3fstack",
+        # "crypto_kem/kyber768/m3",
+        # "crypto_kem/kyber768/m3fspeed",
+        # "crypto_kem/kyber768/m3fstack",
+        # "crypto_kem/kyber1024/m3",
+        # "crypto_kem/kyber1024/m3fspeed",
+        # "crypto_kem/kyber1024/m3fstack",
+        "crypto_sign/dilithium2/m3",
+        "crypto_sign/dilithium2/m3plant"
     ]:
         scheme_name = scheme_path.replace("/", "_")
         scheme_type = re.search('crypto_(.*?)_', scheme_name).group(1)
