@@ -10,14 +10,14 @@ from config import Settings
 import os.path
 
 def toLog(name, value, k=None):
-  if value > 20000:
+  if value > 200000:
     value = f"{round(value/1000)}k"
   else:
     value = f"{value}"
   return f"{name}: {value}\n"
 
 def toMacro(name, value, k=None):
-  if value > 20000:
+  if value > 200000:
     value = f"{round(value/1000):,}k"
   else:
     value = f"{value:,}"
@@ -26,14 +26,14 @@ def toMacro(name, value, k=None):
 
 def run_bench(scheme_path, scheme_name, scheme_type, iterations):
     # subprocess.check_call(f"make clean", shell=True)
-    subprocess.check_call(f"make PLATFORM=sam3x8e IMPLEMENTATION_PATH={scheme_path} MUPQ_ITERATIONS={iterations} ./bin/{scheme_name}_speed.bin", shell=True)
-    binary = f"./bin/{scheme_name}_speed.bin"
+    subprocess.check_call(f"make PLATFORM=sam3x8e IMPLEMENTATION_PATH={scheme_path} MUPQ_ITERATIONS={iterations} ./bin/{scheme_name}_f_speed.bin", shell=True)
+    binary = f"./bin/{scheme_name}_f_speed.bin"
     if os.path.isfile(binary) is False:
         print("Binary does not exist")
         exit()
 
     try:
-        subprocess.check_call(f"bossac -a --erase --write --verify --boot=1 --port=/dev/ttyACM0 ./bin/{scheme_name}_speed.bin", shell=True)
+        subprocess.check_call(f"bossac -a --erase --write --verify --boot=1 --port=/dev/ttyACM0 ./bin/{scheme_name}_f_speed.bin", shell=True)
     except:
         print("bossac write failed --> retry")
         return run_bench(scheme_path, scheme_name, scheme_type, iterations)
@@ -90,13 +90,20 @@ def parseLogSpeed(log, ignoreErrors):
         f"cs2_32ntt":  get(lines, "cs2 with 32-bit NTT cycles:"),
         f"ct0_con_var_32ntt":  get(lines, "ct0 part-constant part-variable with 32-bit NTT cycles:"),
         f"ct1_var_32ntt":  get(lines, "ct1 variable time with 32-bit NTT cycles:"),
-        f"multi_moduli_ntt":  get(lines, "multi-moduli ntt cycles:"),
-        f"multi_moduli_ntt_precomp":  get(lines, "multi-moduli ntt precomp cycles:"),
-        f"poly_double_basemul_invntt":  get(lines, "multi-moduli basemul+intt cycles:"),
-        f"double_CRT":  get(lines, "multi-moduli double crt cycles:"),
+        f"small_ntt":  get(lines, "small ntt cycles:"),
+        f"small_invntt":  get(lines, "small invntt cycles:"),
+        f"small_point_mul":  get(lines, "small point_mul cycles:"),
+        f"small_asym_mul":  get(lines, "small asymmetric_mul cycles:"),
+        f"multi_moduli_ntt":  get(lines, "double ntt cycles:"),
+        f"multi_moduli_ntt_precomp":  get(lines, "double ntt precomp cycles:"),
+        f"multi_moduli_invntt":  get(lines, "double_invntt cycles:"),
+        f"double_asym_mul":  get(lines, "double_asymmetric_mul cycles:"),
+        f"double_CRT":  get(lines, "multi-moduli crt cycles:"),
+        f"poly_double_basemul_invntt":  get(lines, "double basemul+intt+crt cycles:"),
         f"cs1_16ntt":  get(lines, "cs1 small NTT cycles:"),
         f"cs2_16ntt":  get(lines, "cs2 small NTT cycles:"),
         f"ct0_multi_moduli_ntt":  get(lines, "ct0 double NTT cycles:"),
+        f"keccak_permute":  get(lines, "KeccakF1600_StatePermute cycles:"),
     })
 
 def average(results):
@@ -130,7 +137,7 @@ def bench(scheme_path, scheme_name, scheme_type, iterations, outfile, ignoreErro
 with open(f"poly_benchmarks.txt", "a") as outfile:
 
     now = datetime.datetime.now(datetime.timezone.utc)
-    iterations = 1 # defines the number of measurements to perform
+    iterations = 1000 # defines the number of measurements to perform
     print(f"% Polynomial arithmetic benchmarking measurements written on {now}; iterations={iterations}\n", file=outfile)
 
     # subprocess.check_call(f"make clean", shell=True)
@@ -146,8 +153,11 @@ with open(f"poly_benchmarks.txt", "a") as outfile:
         # "crypto_kem/kyber1024/m3",
         # "crypto_kem/kyber1024/m3fspeed",
         # "crypto_kem/kyber1024/m3fstack",
-        "crypto_sign/dilithium2/m3",
-        "crypto_sign/dilithium2/m3plant"
+        # "crypto_sign/dilithium2/m3",
+        # "crypto_sign/dilithium2/m3plant",
+        # "crypto_sign/dilithium2/m3",
+        # "crypto_sign/dilithium3/m3plant",
+        "crypto_sign/dilithium5/m3plant"
     ]:
         scheme_name = scheme_path.replace("/", "_")
         scheme_type = re.search('crypto_(.*?)_', scheme_name).group(1)

@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "poly.h"
-#include "implvariant.h"
+#include "config.h"
 
 // https://stackoverflow.com/a/1489985/1711232
 #define PASTER(x, y) x##y

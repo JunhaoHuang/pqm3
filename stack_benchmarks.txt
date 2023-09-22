@@ -92,3 +92,7 @@
 \DefineVar{crypto_kem_kyber1024_m3fstackencaps_stack_usage}{3\,284}
 \DefineVar{crypto_kem_kyber1024_m3fstackdecaps_stack_usage}{3\,300}
 
+% Stack Benchmarking measurements written on 2023-09-18 12:36:26.168113+00:00;
+
+% Stack Benchmarking measurements written on 2023-09-18 12:58:10.608513+00:00;
+

@@ -91,7 +91,7 @@
 .endm
 
 
-// |input|<kq; output:
+// |input|<0.5q; output:
 .global invntt_fast
 .type invntt_fast, %function
 .align 2

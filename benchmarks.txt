@@ -110,3 +110,96 @@
 \DefineVar{crypto_sign_dilithium2_m3plantsign}{6\,524k}
 \DefineVar{crypto_sign_dilithium2_m3plantverify}{1\,949k}
 
+% Benchmarking measurements written on 2023-09-07 10:59:39.292106+00:00; iterations=10000
+
+%M3 results for crypto_sign_dilithium2_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3keygen}{2\,059k}
+\DefineVar{crypto_sign_dilithium2_m3sign}{7\,256k}
+\DefineVar{crypto_sign_dilithium2_m3verify}{1\,949k}
+
+%M3 results for crypto_sign_dilithium2_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3plantkeygen}{2\,052k}
+\DefineVar{crypto_sign_dilithium2_m3plantsign}{6\,214k}
+\DefineVar{crypto_sign_dilithium2_m3plantverify}{1\,949k}
+
+% Benchmarking measurements written on 2023-09-11 09:14:38.912735+00:00; iterations=10000
+
+%M3 results for crypto_sign_dilithium2_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3keygen}{1\,745k}
+\DefineVar{crypto_sign_dilithium2_m3sign}{6\,632k}
+\DefineVar{crypto_sign_dilithium2_m3verify}{1\,648k}
+
+% Benchmarking measurements written on 2023-09-11 12:31:53.027862+00:00; iterations=10000
+
+%M3 results for crypto_sign_dilithium2_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3plantkeygen}{1\,739k}
+\DefineVar{crypto_sign_dilithium2_m3plantsign}{5\,594k}
+\DefineVar{crypto_sign_dilithium2_m3plantverify}{1\,648k}
+
+% Benchmarking measurements written on 2023-09-18 12:45:52.620435+00:00; iterations=100
+
+%M3 results for crypto_sign_dilithium2_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3keygen}{1\,746k}
+\DefineVar{crypto_sign_dilithium2_m3sign}{6\,754k}
+\DefineVar{crypto_sign_dilithium2_m3verify}{1\,648k}
+
+%M3 results for crypto_sign_dilithium2_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3plantkeygen}{1\,740k}
+\DefineVar{crypto_sign_dilithium2_m3plantsign}{6\,022k}
+\DefineVar{crypto_sign_dilithium2_m3plantverify}{1\,648k}
+
+%M3 results for crypto_sign_dilithium3_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium3_m3keygen}{3\,024k}
+\DefineVar{crypto_sign_dilithium3_m3sign}{9\,306k}
+\DefineVar{crypto_sign_dilithium3_m3verify}{2\,755k}
+
+%M3 results for crypto_sign_dilithium3_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium3_m3plantkeygen}{3\,011k}
+\DefineVar{crypto_sign_dilithium3_m3plantsign}{8\,229k}
+\DefineVar{crypto_sign_dilithium3_m3plantverify}{2\,755k}
+
+% Benchmarking measurements written on 2023-09-22 04:36:40.794879+00:00; iterations=1000
+% with keccak optimizations
+%M3 results for crypto_sign_dilithium2_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3keygen}{1\,745k}
+\DefineVar{crypto_sign_dilithium2_m3sign}{6\,639k}
+\DefineVar{crypto_sign_dilithium2_m3verify}{1\,648k}
+
+%M3 results for crypto_sign_dilithium2_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3plantkeygen}{1\,739k}
+\DefineVar{crypto_sign_dilithium2_m3plantsign}{5\,582k}
+\DefineVar{crypto_sign_dilithium2_m3plantverify}{1\,648k}
+
+%M3 results for crypto_sign_dilithium3_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium3_m3keygen}{3\,024k}
+\DefineVar{crypto_sign_dilithium3_m3sign}{10\,918k}
+\DefineVar{crypto_sign_dilithium3_m3verify}{2\,755k}
+
+%M3 results for crypto_sign_dilithium3_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium3_m3plantkeygen}{3\,011k}
+\DefineVar{crypto_sign_dilithium3_m3plantsign}{9\,087k}
+\DefineVar{crypto_sign_dilithium3_m3plantverify}{2\,755k}
+
+without keccak optimizations
+% Benchmarking measurements written on 2023-09-22 06:49:14.483064+00:00; iterations=1000
+
+%M3 results for crypto_sign_dilithium2_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3keygen}{2\,059k}
+\DefineVar{crypto_sign_dilithium2_m3sign}{7\,139k}
+\DefineVar{crypto_sign_dilithium2_m3verify}{1\,949k}
+
+%M3 results for crypto_sign_dilithium2_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium2_m3plantkeygen}{2\,052k}
+\DefineVar{crypto_sign_dilithium2_m3plantsign}{6\,363k}
+\DefineVar{crypto_sign_dilithium2_m3plantverify}{1\,949k}
+
+%M3 results for crypto_sign_dilithium3_m3 (type=sign)
+\DefineVar{crypto_sign_dilithium3_m3keygen}{3\,594k}
+\DefineVar{crypto_sign_dilithium3_m3sign}{11\,916k}
+\DefineVar{crypto_sign_dilithium3_m3verify}{3\,283k}
+
+%M3 results for crypto_sign_dilithium3_m3plant (type=sign)
+\DefineVar{crypto_sign_dilithium3_m3plantkeygen}{3\,582k}
+\DefineVar{crypto_sign_dilithium3_m3plantsign}{10\,418k}
+\DefineVar{crypto_sign_dilithium3_m3plantverify}{3\,283k}
+

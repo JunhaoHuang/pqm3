@@ -2,5 +2,5 @@
 #define CONFIG_H
 
 #define DILITHIUM_MODE 3
-
+#define old
 #endif

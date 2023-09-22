@@ -38,7 +38,7 @@ def run_bench(scheme_path, scheme_name, scheme_type):
         return run_bench(scheme_path, scheme_name, scheme_type)
 
     # get serial output and wait for '#'
-    with serial.Serial(Settings.SERIAL_DEVICE, 9600, timeout=10) as dev:
+    with serial.Serial(Settings.SERIAL_DEVICE, 9600, timeout=1000) as dev:
         logs = []
         iteration = 0
         log = b""
@@ -131,7 +131,9 @@ with open(f"stack_benchmarks.txt", "a") as outfile:
         # "crypto_kem/kyber1024/m3fspeed",
         # "crypto_kem/kyber1024/m3fstack",
         "crypto_sign/dilithium2/m3",
-        "crypto_sign/dilithium2/m3plant"
+        "crypto_sign/dilithium2/m3plant",
+        "crypto_sign/dilithium3/m3",
+        "crypto_sign/dilithium3/m3plant"
     ]:
         scheme_name = scheme_path.replace("/", "_")
         scheme_type = re.search('crypto_(.*?)_', scheme_name).group(1)
