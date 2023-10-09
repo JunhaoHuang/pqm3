@@ -91,6 +91,37 @@ int crypto_sign_keypair(uint8_t* pk, uint8_t* sk)
   return 0;
 }
 
+void precompute_strategy_1_sk_parts(struct strategy_1_sk_precomp* precomp,
+                                    const uint8_t* sk)
+{
+  uint8_t rho[SEEDBYTES], tr[CRHBYTES], key[SEEDBYTES];
+  // smallpoly s1_prime[L], s2_prime[K];
+  // polyveck t0;
+  unpack_sk_new(rho, tr, key, &precomp->t0hat, precomp->s1hat, precomp->s2hat, sk);
+
+  // Initialize all polynomials that can be precomputed
+  // precomp->s1hat = s1_prime;
+  // precomp->s2hat = s2_prime;
+  // precomp->t0hat = t0;
+
+  polyvecl_ntt(&precomp->s1hat);
+  polyveck_ntt(&precomp->s2hat);
+  for (size_t i = 0; i < K; ++i) {
+    poly_ntt_leaktime(&precomp->t0hat.vec[i]);
+  }
+
+  // Precompute the matrix A
+  polyvec_matrix_expand(precomp->mat, rho);
+
+  // Copy the other parts to the struct
+  for (size_t i = 0; i < SEEDBYTES; i++) {
+    precomp->key[i] = key[i];
+  }
+  for (size_t i = 0; i < CRHBYTES; i++) {
+    precomp->tr[i] = tr[i];
+  }
+}
+
 /*************************************************
  * Name:        crypto_sign_signature
  *

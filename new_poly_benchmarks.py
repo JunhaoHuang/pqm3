@@ -10,19 +10,19 @@ from config import Settings
 import os.path
 
 def toLog(name, value, k=None):
-  if value > 200000:
+  if value > 100000:
     value = f"{round(value/1000)}k"
   else:
     value = f"{value}"
   return f"{name}: {value}\n"
 
 def toMacro(name, value, k=None):
-  if value > 200000:
+  if value > 100000:
     value = f"{round(value/1000):,}k"
   else:
     value = f"{value:,}"
   value = value.replace(",", "\\,")
-  return f"\\DefineVar{{{name}}}{{{value}}}\n"
+  return f"\\def\\{name}{{{value}}}\n"
 
 def run_bench(scheme_path, scheme_name, scheme_type, iterations):
     # subprocess.check_call(f"make clean", shell=True)
@@ -155,7 +155,6 @@ with open(f"poly_benchmarks.txt", "a") as outfile:
         # "crypto_kem/kyber1024/m3fstack",
         # "crypto_sign/dilithium2/m3",
         # "crypto_sign/dilithium2/m3plant",
-        # "crypto_sign/dilithium2/m3",
         # "crypto_sign/dilithium3/m3plant",
         "crypto_sign/dilithium5/m3plant"
     ]:

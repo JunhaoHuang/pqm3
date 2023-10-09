@@ -22,7 +22,7 @@ def toMacro(name, value, k=None):
   else:
     value = f"{value:,}"
   value = value.replace(",", "\\,")
-  return f"\\DefineVar{{{name}_stack_usage}}{{{value}}}\n"
+  return f"\\def\\{name}{{{value}}}\n"
 
 def run_bench(scheme_path, scheme_name, scheme_type):
     subprocess.check_call(f"make PLATFORM=sam3x8e IMPLEMENTATION_PATH={scheme_path} ./bin/{scheme_name}_stack.bin", shell=True)
