@@ -96,3 +96,50 @@
 
 % Stack Benchmarking measurements written on 2023-09-18 12:58:10.608513+00:00;
 
+% Stack Benchmarking measurements written on 2023-10-10 05:39:51.104946+00:00;
+
+%M3 results for crypto_kem_kyber512-90s_m3 (type=kem)
+\def\crypto_kem_kyber51290s_m3keygen{2\,904}
+\def\crypto_kem_kyber51290s_m3encaps{2\,992}
+\def\crypto_kem_kyber51290s_m3decaps{3\,000}
+
+%M3 results for crypto_kem_kyber512-90s_m3fspeed (type=kem)
+\def\crypto_kem_kyber51290s_m3fspeedkeygen{4\,000}
+\def\crypto_kem_kyber51290s_m3fspeedencaps{4\,592}
+\def\crypto_kem_kyber51290s_m3fspeeddecaps{4\,592}
+
+%M3 results for crypto_kem_kyber512-90s_m3fstack (type=kem)
+\def\crypto_kem_kyber51290s_m3fstackkeygen{2\,904}
+\def\crypto_kem_kyber51290s_m3fstackencaps{2\,992}
+\def\crypto_kem_kyber51290s_m3fstackdecaps{3\,000}
+
+%M3 results for crypto_kem_kyber768-90s_m3 (type=kem)
+\def\crypto_kem_kyber76890s_m3keygen{3\,432}
+\def\crypto_kem_kyber76890s_m3encaps{3\,504}
+\def\crypto_kem_kyber76890s_m3decaps{3\,512}
+
+%M3 results for crypto_kem_kyber768-90s_m3fspeed (type=kem)
+\def\crypto_kem_kyber76890s_m3fspeedkeygen{4\,776}
+\def\crypto_kem_kyber76890s_m3fspeedencaps{5\,368}
+\def\crypto_kem_kyber76890s_m3fspeeddecaps{5\,368}
+
+%M3 results for crypto_kem_kyber768-90s_m3fstack (type=kem)
+\def\crypto_kem_kyber76890s_m3fstackkeygen{3\,432}
+\def\crypto_kem_kyber76890s_m3fstackencaps{3\,504}
+\def\crypto_kem_kyber76890s_m3fstackdecaps{3\,512}
+
+%M3 results for crypto_kem_kyber1024-90s_m3 (type=kem)
+\def\crypto_kem_kyber102490s_m3keygen{4\,636}
+\def\crypto_kem_kyber102490s_m3encaps{4\,000}
+\def\crypto_kem_kyber102490s_m3decaps{4\,016}
+
+%M3 results for crypto_kem_kyber1024-90s_m3fspeed (type=kem)
+\def\crypto_kem_kyber102490s_m3fspeedkeygen{5\,544}
+\def\crypto_kem_kyber102490s_m3fspeedencaps{6\,136}
+\def\crypto_kem_kyber102490s_m3fspeeddecaps{6\,136}
+
+%M3 results for crypto_kem_kyber1024-90s_m3fstack (type=kem)
+\def\crypto_kem_kyber102490s_m3fstackkeygen{4\,636}
+\def\crypto_kem_kyber102490s_m3fstackencaps{4\,000}
+\def\crypto_kem_kyber102490s_m3fstackdecaps{4\,016}
+

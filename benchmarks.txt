@@ -203,3 +203,50 @@ without keccak optimizations
 \DefineVar{crypto_sign_dilithium3_m3plantsign}{10\,418k}
 \DefineVar{crypto_sign_dilithium3_m3plantverify}{3\,283k}
 
+% Benchmarking measurements written on 2023-10-10 05:27:25.470605+00:00; iterations=100
+
+%M3 results for crypto_kem_kyber512-90s_m3 (type=kem)
+\def\crypto_kem_kyber51290s_m3keygen{467k}
+\def\crypto_kem_kyber51290s_m3encaps{527k}
+\def\crypto_kem_kyber51290s_m3decaps{558k}
+
+%M3 results for crypto_kem_kyber512-90s_m3fspeed (type=kem)
+\def\crypto_kem_kyber51290s_m3fspeedkeygen{443k}
+\def\crypto_kem_kyber51290s_m3fspeedencaps{502k}
+\def\crypto_kem_kyber51290s_m3fspeeddecaps{523k}
+
+%M3 results for crypto_kem_kyber512-90s_m3fstack (type=kem)
+\def\crypto_kem_kyber51290s_m3fstackkeygen{445k}
+\def\crypto_kem_kyber51290s_m3fstackencaps{505k}
+\def\crypto_kem_kyber51290s_m3fstackdecaps{526k}
+
+%M3 results for crypto_kem_kyber768-90s_m3 (type=kem)
+\def\crypto_kem_kyber76890s_m3keygen{782k}
+\def\crypto_kem_kyber76890s_m3encaps{868k}
+\def\crypto_kem_kyber76890s_m3decaps{909k}
+
+%M3 results for crypto_kem_kyber768-90s_m3fspeed (type=kem)
+\def\crypto_kem_kyber76890s_m3fspeedkeygen{741k}
+\def\crypto_kem_kyber76890s_m3fspeedencaps{828k}
+\def\crypto_kem_kyber76890s_m3fspeeddecaps{854k}
+
+%M3 results for crypto_kem_kyber768-90s_m3fstack (type=kem)
+\def\crypto_kem_kyber76890s_m3fstackkeygen{748k}
+\def\crypto_kem_kyber76890s_m3fstackencaps{839k}
+\def\crypto_kem_kyber76890s_m3fstackdecaps{865k}
+
+%M3 results for crypto_kem_kyber1024-90s_m3 (type=kem)
+\def\crypto_kem_kyber102490s_m3keygen{1\,224k}
+\def\crypto_kem_kyber102490s_m3encaps{1\,332k}
+\def\crypto_kem_kyber102490s_m3decaps{1\,383k}
+
+%M3 results for crypto_kem_kyber1024-90s_m3fspeed (type=kem)
+\def\crypto_kem_kyber102490s_m3fspeedkeygen{1\,170k}
+\def\crypto_kem_kyber102490s_m3fspeedencaps{1\,274k}
+\def\crypto_kem_kyber102490s_m3fspeeddecaps{1\,306k}
+
+%M3 results for crypto_kem_kyber1024-90s_m3fstack (type=kem)
+\def\crypto_kem_kyber102490s_m3fstackkeygen{1\,178k}
+\def\crypto_kem_kyber102490s_m3fstackencaps{1\,293k}
+\def\crypto_kem_kyber102490s_m3fstackdecaps{1\,326k}
+
