@@ -39,7 +39,7 @@ def run_bench(scheme_path, scheme_name, scheme_type, iterations):
         return run_bench(scheme_path, scheme_name, scheme_type, iterations)
 
     # get serial output and wait for '#'
-    with serial.Serial(Settings.SERIAL_DEVICE, 9600, timeout=10) as dev:
+    with serial.Serial(Settings.SERIAL_DEVICE, 9600, timeout=1000) as dev:
         logs = []
         iteration = 0
         log = b""

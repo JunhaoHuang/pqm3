@@ -203,6 +203,14 @@ without keccak optimizations
 \DefineVar{crypto_sign_dilithium3_m3plantsign}{10\,418k}
 \DefineVar{crypto_sign_dilithium3_m3plantverify}{3\,283k}
 
+% Benchmarking measurements written on 2023-10-11 13:10:47.183927+00:00; iterations=1000
+
+%M3 results for crypto_sign_dilithium5_m3plant (type=sign)
+\def\crypto_sign_dilithium5_m3plantkeygen{5\,034k}
+\def\crypto_sign_dilithium5_m3plantsign{20\,193k}
+\def\crypto_sign_dilithium5_m3plantverify{4\,694k}
+
+
 % Benchmarking measurements written on 2023-10-10 05:27:25.470605+00:00; iterations=100
 
 %M3 results for crypto_kem_kyber512-90s_m3 (type=kem)

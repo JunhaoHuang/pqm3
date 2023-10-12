@@ -91,37 +91,6 @@ int crypto_sign_keypair(uint8_t* pk, uint8_t* sk)
   return 0;
 }
 
-void precompute_strategy_1_sk_parts(struct strategy_1_sk_precomp* precomp,
-                                    const uint8_t* sk)
-{
-  uint8_t rho[SEEDBYTES], tr[CRHBYTES], key[SEEDBYTES];
-  // smallpoly s1_prime[L], s2_prime[K];
-  // polyveck t0;
-  unpack_sk_new(rho, tr, key, &precomp->t0hat, precomp->s1hat, precomp->s2hat, sk);
-
-  // Initialize all polynomials that can be precomputed
-  // precomp->s1hat = s1_prime;
-  // precomp->s2hat = s2_prime;
-  // precomp->t0hat = t0;
-
-  polyvecl_ntt(&precomp->s1hat);
-  polyveck_ntt(&precomp->s2hat);
-  for (size_t i = 0; i < K; ++i) {
-    poly_ntt_leaktime(&precomp->t0hat.vec[i]);
-  }
-
-  // Precompute the matrix A
-  polyvec_matrix_expand(precomp->mat, rho);
-
-  // Copy the other parts to the struct
-  for (size_t i = 0; i < SEEDBYTES; i++) {
-    precomp->key[i] = key[i];
-  }
-  for (size_t i = 0; i < CRHBYTES; i++) {
-    precomp->tr[i] = tr[i];
-  }
-}
-
 /*************************************************
  * Name:        crypto_sign_signature
  *
@@ -141,7 +110,7 @@ int crypto_sign_signature(
   uint8_t seedbuf[3 * SEEDBYTES + 2 * CRHBYTES];
   uint8_t *rho, *tr, *key, *mu, *rhoprime;
   uint16_t nonce = 0;
-  polyvecl mat[K], y, z;
+  polyvecl mat, y, z;
   polyveck t0, w1, w0;
   poly cp, cp_prime;
   shake256incctx state;
@@ -172,7 +141,7 @@ int crypto_sign_signature(
 #endif
 
   /* Expand matrix and transform vectors */
-  polyvec_matrix_expand(mat, rho);
+  // polyvec_matrix_expand(mat, rho);
   polyvecl_small_ntt(s1_prime);
   polyveck_small_ntt(s2_prime);
   polyveck_double_ntt(&t0);
@@ -184,7 +153,14 @@ rej:
   /* Matrix-vector multiplication */
   z = y;
   polyvecl_ntt(&z);
-  polyvec_matrix_pointwise_montgomery(&w1, mat, &z);
+  for (int i = 0; i < K; ++i){
+    for (int j = 0; j < L; ++j) {
+      poly_uniform(&mat.vec[j], rho, (i << 8) + j);
+    }
+    polyvecl_pointwise_acc_montgomery_leaktime(&w1.vec[i], &mat, &z);
+  }
+  
+  // polyvec_matrix_pointwise_montgomery(&w1, mat, &z);
   polyveck_reduce(&w1);
   polyveck_invntt_tomont(&w1);
 
@@ -208,7 +184,7 @@ rej:
 
   polyvecl_add(&z, &z, &y);
   polyvecl_reduce(&z);
-  if (polyvecl_chknorm(&z, GAMMA1 - BETA)){
+  if (polyvecl_chknorm(&z, GAMMA1 - BETA)) {
     goto rej;
   }
 
@@ -285,77 +261,6 @@ int crypto_sign(uint8_t* sm, size_t* smlen, const uint8_t* m, size_t mlen, const
  * Returns 0 if signature could be verified correctly and -1 otherwise
  **************************************************/
 
-int crypto_sign_verify_multi_moduli(const uint8_t* sig,
-                       size_t siglen,
-                       const uint8_t* m,
-                       size_t mlen,
-                       const uint8_t* pk)
-{
-  unsigned int i;
-  uint8_t buf[K * POLYW1_PACKEDBYTES];
-  uint8_t rho[SEEDBYTES];
-  uint8_t mu[CRHBYTES];
-  uint8_t c[SEEDBYTES];
-  uint8_t c2[SEEDBYTES];
-  poly cp, cp_prime;
-  polyvecl mat[K], z;
-  polyveck t1, w1, h;
-  shake256incctx state;
-
-  if (siglen != CRYPTO_BYTES)
-    return -1;
-
-  unpack_pk_new(rho, &t1, pk);
-  if (unpack_sig(c, &z, &h, sig))
-    return -1;
-  if (polyvecl_chknorm(&z, GAMMA1 - BETA))
-    return -1;
-
-  /* Compute CRH(h(rho, t1), msg) */
-  shake256(mu, SEEDBYTES, pk, CRYPTO_PUBLICKEYBYTES);
-  shake256_inc_init(&state);
-  shake256_inc_absorb(&state, mu, SEEDBYTES);
-  shake256_inc_absorb(&state, m, mlen);
-  shake256_inc_finalize(&state);
-  shake256_inc_squeeze(mu, CRHBYTES, &state);
-
-  /* Matrix-vector multiplication; compute Az - ct1*2^d */
-  polyvec_matrix_expand(mat, rho);
-  polyvecl_ntt_leaktime(&z);
-  polyvec_matrix_pointwise_montgomery_leaktime(&w1, mat, &z);
-  polyveck_invntt_tomont_leaktime(&w1);
-
-  // poly_challenge(&cp, c);
-  poly_challenge_new(&cp, c);
-  poly_double_ntt_precomp(&cp_prime, &cp);
-  polyveck_double_ntt(&t1);
-  polyveck_double_basemul_invntt(&t1, &cp, &cp_prime, &t1);
-  polyveck_shiftl(&t1);
-
-  // polyveck_shiftl(&t1);
-  // polyveck_ntt_leaktime(&t1);
-  // polyveck_pointwise_poly_montgomery(&t1, &cp, &t1);
-  polyveck_sub(&w1, &w1, &t1);
-  polyveck_reduce(&w1);
-
-  /* Reconstruct w1 */
-  polyveck_caddq(&w1);
-  polyveck_use_hint(&w1, &w1, &h);
-  polyveck_pack_w1(buf, &w1);
-
-  /* Call random oracle and verify challenge */
-  shake256_inc_init(&state);
-  shake256_inc_absorb(&state, mu, CRHBYTES);
-  shake256_inc_absorb(&state, buf, K * POLYW1_PACKEDBYTES);
-  shake256_inc_finalize(&state);
-  shake256_inc_squeeze(c2, SEEDBYTES, &state);
-  for (i = 0; i < SEEDBYTES; ++i)
-    if (c[i] != c2[i])
-      return -1;
-
-  return 0;
-}
-
 int crypto_sign_verify(const uint8_t* sig,
                        size_t siglen,
                        const uint8_t* m,
@@ -369,7 +274,7 @@ int crypto_sign_verify(const uint8_t* sig,
   uint8_t c[SEEDBYTES];
   uint8_t c2[SEEDBYTES];
   poly cp;
-  polyvecl mat[K], z;
+  polyvecl mat, z;
   polyveck t1, w1, h;
   shake256incctx state;
 
@@ -392,10 +297,16 @@ int crypto_sign_verify(const uint8_t* sig,
 
   /* Matrix-vector multiplication; compute Az - c2^dt1 */
   poly_challenge(&cp, c);
-  polyvec_matrix_expand(mat, rho);
-
+  // polyvec_matrix_expand(mat, rho);
   polyvecl_ntt_leaktime(&z);
-  polyvec_matrix_pointwise_montgomery_leaktime(&w1, mat, &z);
+  for (int i = 0; i < K; ++i) {
+    for (int j = 0; j < L; ++j) {
+      poly_uniform(&mat.vec[j], rho, (i << 8) + j);
+    }
+    polyvecl_pointwise_acc_montgomery_leaktime(&w1.vec[i], &mat, &z);
+  }
+  
+  // polyvec_matrix_pointwise_montgomery_leaktime(&w1, mat, &z);
 
   poly_ntt_leaktime(&cp);
   polyveck_shiftl(&t1);

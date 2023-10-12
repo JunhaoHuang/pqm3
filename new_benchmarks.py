@@ -39,7 +39,7 @@ def run_bench(scheme_path, scheme_name, scheme_type, iterations):
         return run_bench(scheme_path, scheme_name, scheme_type, iterations)
 
     # get serial output and wait for '#'
-    with serial.Serial(Settings.SERIAL_DEVICE, 9600, timeout=10) as dev:
+    with serial.Serial(Settings.SERIAL_DEVICE, 9600, timeout=1000) as dev:
         logs = []
         iteration = 0
         log = b""
@@ -115,7 +115,7 @@ def bench(scheme_path, scheme_name, scheme_type, iterations, outfile, ignoreErro
 with open(f"benchmarks.txt", "a") as outfile:
 
     now = datetime.datetime.now(datetime.timezone.utc)
-    iterations = 100 # defines the number of measurements to perform
+    iterations = 1000 # defines the number of measurements to perform
     print(f"% Benchmarking measurements written on {now}; iterations={iterations}\n", file=outfile)
 
     # subprocess.check_call(f"make clean", shell=True)
@@ -131,19 +131,21 @@ with open(f"benchmarks.txt", "a") as outfile:
         # "crypto_kem/kyber1024/m3",
         # "crypto_kem/kyber1024/m3fspeed",
         # "crypto_kem/kyber1024/m3fstack",
-        "crypto_kem/kyber512-90s/m3",
-        "crypto_kem/kyber512-90s/m3fspeed",
-        "crypto_kem/kyber512-90s/m3fstack",
-        "crypto_kem/kyber768-90s/m3",
-        "crypto_kem/kyber768-90s/m3fspeed",
-        "crypto_kem/kyber768-90s/m3fstack",
-        "crypto_kem/kyber1024-90s/m3",
-        "crypto_kem/kyber1024-90s/m3fspeed",
-        "crypto_kem/kyber1024-90s/m3fstack",
+        # "crypto_kem/kyber512-90s/m3",
+        # "crypto_kem/kyber512-90s/m3fspeed",
+        # "crypto_kem/kyber512-90s/m3fstack",
+        # "crypto_kem/kyber768-90s/m3",
+        # "crypto_kem/kyber768-90s/m3fspeed",
+        # "crypto_kem/kyber768-90s/m3fstack",
+        # "crypto_kem/kyber1024-90s/m3",
+        # "crypto_kem/kyber1024-90s/m3fspeed",
+        # "crypto_kem/kyber1024-90s/m3fstack",
         # "crypto_sign/dilithium2/m3",
         # "crypto_sign/dilithium2/m3plant",
         # "crypto_sign/dilithium3/m3",
-        # "crypto_sign/dilithium3/m3plant"
+        # "crypto_sign/dilithium3/m3plant",
+        # "crypto_sign/dilithium5/m3",
+        "crypto_sign/dilithium5/m3plant"
     ]:
         scheme_name = scheme_path.replace("/", "_")
         scheme_type = re.search('crypto_(.*?)_', scheme_name).group(1)

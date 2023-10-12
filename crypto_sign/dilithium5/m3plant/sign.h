@@ -10,14 +10,7 @@
 
 #define challenge DILITHIUM_NAMESPACE(challenge)
 void challenge(poly *c, const uint8_t seed[SEEDBYTES]);
-struct strategy_1_sk_precomp {
-  polyveck t0hat;
-  smallpoly s2hat[K],s1hat[L];
-  polyvecl mat[K];
-  uint8_t key[SEEDBYTES], tr[CRHBYTES];
-};
-void precompute_strategy_1_sk_parts(struct strategy_1_sk_precomp* precomp,
-                                    const uint8_t* sk);
+
 // #define crypto_sign_keypair DILITHIUM_NAMESPACE(crypto_sign_keypair)
 // int crypto_sign_keypair(uint8_t *pk, uint8_t *sk);
 
