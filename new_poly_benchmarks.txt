@@ -1,0 +1,53 @@
+% Polynomial arithmetic benchmarking measurements written on 2023-03-15 13:06:43.286604+00:00; iterations=1
+
+%M3 results for crypto_kem_kyber512_m3 (type=kem)
+\DefineVar{crypto_kem_kyber512_m3ntt}{10\,874}
+\DefineVar{crypto_kem_kyber512_m3invntt}{13\,049}
+\DefineVar{crypto_kem_kyber512_m3basemul}{4\,821}
+
+%M3 results for crypto_kem_kyber512_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber512_m3fspeedntt}{8\,026}
+\DefineVar{crypto_kem_kyber512_m3fspeedinvntt}{8\,594}
+\DefineVar{crypto_kem_kyber512_m3fspeedpoly_basemul_opt_16_32}{3\,028}
+\DefineVar{crypto_kem_kyber512_m3fspeedpoly_basemul_acc_opt_32_32}{3\,922}
+\DefineVar{crypto_kem_kyber512_m3fspeedpoly_basemul_acc_opt_32_16}{5\,851}
+
+%M3 results for crypto_kem_kyber512_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber512_m3fstackntt}{8\,026}
+\DefineVar{crypto_kem_kyber512_m3fstackinvntt}{8\,595}
+\DefineVar{crypto_kem_kyber512_m3fstackbasemul}{4\,311}
+
+%M3 results for crypto_kem_kyber768_m3 (type=kem)
+\DefineVar{crypto_kem_kyber768_m3ntt}{10\,874}
+\DefineVar{crypto_kem_kyber768_m3invntt}{13\,049}
+\DefineVar{crypto_kem_kyber768_m3basemul}{4\,821}
+
+%M3 results for crypto_kem_kyber768_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber768_m3fspeedntt}{8\,026}
+\DefineVar{crypto_kem_kyber768_m3fspeedinvntt}{8\,594}
+\DefineVar{crypto_kem_kyber768_m3fspeedpoly_basemul_opt_16_32}{3\,028}
+\DefineVar{crypto_kem_kyber768_m3fspeedpoly_basemul_acc_opt_32_32}{3\,922}
+\DefineVar{crypto_kem_kyber768_m3fspeedpoly_basemul_acc_opt_32_16}{5\,851}
+
+%M3 results for crypto_kem_kyber768_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber768_m3fstackntt}{8\,026}
+\DefineVar{crypto_kem_kyber768_m3fstackinvntt}{8\,799}
+\DefineVar{crypto_kem_kyber768_m3fstackbasemul}{4\,311}
+
+%M3 results for crypto_kem_kyber1024_m3 (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3ntt}{10\,874}
+\DefineVar{crypto_kem_kyber1024_m3invntt}{13\,049}
+\DefineVar{crypto_kem_kyber1024_m3basemul}{4\,821}
+
+%M3 results for crypto_kem_kyber1024_m3fspeed (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3fspeedntt}{8\,026}
+\DefineVar{crypto_kem_kyber1024_m3fspeedinvntt}{8\,594}
+\DefineVar{crypto_kem_kyber1024_m3fspeedpoly_basemul_opt_16_32}{3\,028}
+\DefineVar{crypto_kem_kyber1024_m3fspeedpoly_basemul_acc_opt_32_32}{3\,922}
+\DefineVar{crypto_kem_kyber1024_m3fspeedpoly_basemul_acc_opt_32_16}{5\,851}
+
+%M3 results for crypto_kem_kyber1024_m3fstack (type=kem)
+\DefineVar{crypto_kem_kyber1024_m3fstackntt}{8\,026}
+\DefineVar{crypto_kem_kyber1024_m3fstackinvntt}{8\,799}
+\DefineVar{crypto_kem_kyber1024_m3fstackbasemul}{4\,311}
+
